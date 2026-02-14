@@ -1,7 +1,8 @@
 #Importaciones
-from fastapi import FastAPI
+from fastapi import FastAPI, status, HTTPException
 import asyncio
 from typing import Optional
+
 
 #Instancia del servidor
 app = FastAPI(
@@ -32,12 +33,12 @@ async def Hola():
            
            }
 #API con parametro Obligatorio
-@app.get("/v1/usuario/{id}", tags=['Parametro Obligatorio'])
+@app.get("/v1/parametroOb/{id}", tags=['Parametro Obligatorio'])
 async def consultaUno(id:int):
     return{"Se encontro usuario": id}
 
 #API con parametro Opcional
-@app.get("/v1/usuario/", tags=['Parametro Opcional'])
+@app.get("/v1/parametroOp/", tags=['Parametro Opcional'])
 async def consultaTodos(id:Optional[int]=None):
     if id is not None:
         for usuario in usuarios:
@@ -47,3 +48,44 @@ async def consultaTodos(id:Optional[int]=None):
     else:
         return{"mensaje": "No se proporciono id"}
             
+
+#Endpoint donde utiliza el GET 
+
+@app.get("/v1/usuarios/", tags=['CRUD HTTP'])
+async def leer_usuarios():
+    return{
+        "status":"200",
+        "total": len(usuarios),
+        "usuarios":usuarios
+    }
+
+#Endpoint para post, nota: Si pueden tener el mismo nombre mientras sean diferentes, si son dos get ahi no.
+@app.post("/v1/usuarios/", tags=['CRUD HTTP'], status_code=status.HTTP_201_CREATED)
+async def crear_usuarios(usuario:dict):
+    for usr in usuarios:
+        if usr["id"] == usuario.get("id"):
+            raise HTTPException (
+                status_code=400,
+                detail="El id ya existe"
+            )
+    usuarios.append(usuario)#append es el insert a mi tabla ficticia 
+    return{
+        "mensaje":"Uusario Agregado",
+        "Usuario":usuario
+    }
+
+@app.put("/v1/usuarios/{id}", tags=['CRUD HTTP'], status_code=status.HTTP_204_NO_CONTENT)
+async def actualizar_usuarios(id:int , usuario:dict):
+    for usr in usuarios:
+        if usr["id"] == id:
+            usr.update(usuario)
+            return{
+                "mensaje":"Usuario Actualizado",
+                "Usuario":usuario
+            }
+    raise HTTPException (
+                status_code=400,
+                detail="El id  existe"
+            )
+            
+  
