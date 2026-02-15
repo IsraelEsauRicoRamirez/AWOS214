@@ -74,18 +74,33 @@ async def crear_usuarios(usuario:dict):
         "Usuario":usuario
     }
 
-@app.put("/v1/usuarios/{id}", tags=['CRUD HTTP'], status_code=status.HTTP_204_NO_CONTENT)
+#Endpoint para Put(Actualizar)
+@app.put("/v1/usuarios/{id}", tags=['CRUD HTTP'], status_code=status.HTTP_200_OK)
 async def actualizar_usuarios(id:int , usuario:dict):
     for usr in usuarios:
         if usr["id"] == id:
             usr.update(usuario)
             return{
                 "mensaje":"Usuario Actualizado",
-                "Usuario":usuario
+                "Usuario":usr
             }
     raise HTTPException (
                 status_code=400,
-                detail="El id  existe"
+                detail="El id no existe"
             )
             
   
+#Endpoint para Delete(Eliminar)
+@app.delete("/v1/usuarios/{id}", tags=['CRUD HTTP'], status_code=status.HTTP_204_NO_CONTENT)
+async def eliminar_usuarios(id:int):
+    for usr in usuarios:
+        if usr["id"] == id:
+            usuarios.remove(usr)
+            return{
+                "mensaje":"Usuario Eliminado",
+                
+            }
+    raise HTTPException (
+                status_code=400,
+                detail="El id no existe"
+            )
