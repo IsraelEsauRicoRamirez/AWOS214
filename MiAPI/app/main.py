@@ -2,6 +2,7 @@
 from fastapi import FastAPI, status, HTTPException
 import asyncio
 from typing import Optional
+from pydantic import BaseModel, Field
 
 
 #Instancia del servidor
@@ -15,9 +16,22 @@ usuarios=[
     {"id":1, "nombre":"Juan", "edad":21},
     {"id":2, "nombre":"Israel", "edad":21},
     {"id":3, "nombre":"Sofi", "edad":21}
-    
-
+ 
 ]
+
+#Modelo de validacion Pydantic
+class usuario_create(BaseModel):
+    id: int = Field(...,gt=0, description="Identificador de usuario")
+    nombre:str = Field(...,min_length=3, max_length=50, example="Juanita" )
+    edad: int  = Field(...,ge=1, le=123, description= "Edad valida entre 1 y 123")
+
+
+#Modelo de validacion de Pydantic para eliminar
+class usuario_delete(BaseModel):
+    id: int = Field(...,gt=0, description="Identificador de usuario")
+   
+
+
 
 #Endpoints
 @app.get("/", tags=['Inicio'])
@@ -61,9 +75,9 @@ async def leer_usuarios():
 
 #Endpoint para post, nota: Si pueden tener el mismo nombre mientras sean diferentes, si son dos get ahi no.
 @app.post("/v1/usuarios/", tags=['CRUD HTTP'], status_code=status.HTTP_201_CREATED)
-async def crear_usuarios(usuario:dict):
+async def crear_usuarios(usuario:usuario_create):
     for usr in usuarios:
-        if usr["id"] == usuario.get("id"):
+        if usr["id"] == usuario.id:
             raise HTTPException (
                 status_code=400,
                 detail="El id ya existe"
