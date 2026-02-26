@@ -1,0 +1,10 @@
+#------COMO ORQUESTAR LOS CONTENEDORES EN ESTE CASO SOLO 1 ---------
+services:
+  api:
+    build: .
+    container_name: server_fastapirepaso
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app:/app/app
+      
