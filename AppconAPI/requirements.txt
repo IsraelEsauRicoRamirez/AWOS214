@@ -1,0 +1,4 @@
+#-----INSTALAR LAS DEPENDENCIAS PARA TRABAJAR-------
+
+fastapi
+uvicorn[standard]
