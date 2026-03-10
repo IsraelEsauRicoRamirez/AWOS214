@@ -5,16 +5,15 @@ Text,
 TextInput,
 FlatList,
 StyleSheet,
-ImageBackground,
 TouchableOpacity,
 ActivityIndicator,
-Alert
+Alert,
+ScrollView
 } from "react-native";
 
 import axios from "axios";
 
 export default function App(){
-
 
 const API = "http://localhost:5000/v1/usuarios/";
 
@@ -25,8 +24,6 @@ const [id,setId] = useState("");
 const [nombre,setNombre] = useState("");
 const [edad,setEdad] = useState("");
 
-
-
 const limpiarCampos = ()=>{
 setId("")
 setNombre("")
@@ -34,7 +31,7 @@ setEdad("")
 }
 
 
-// GET usuarios
+// GET
 const obtenerUsuarios = async () => {
 
 setLoading(true)
@@ -58,8 +55,7 @@ setLoading(false)
 }
 
 
-
-// POST crear usuario
+// POST
 const crearUsuario = async () => {
 
 if(!id || !nombre || !edad){
@@ -102,8 +98,7 @@ setLoading(false)
 }
 
 
-
-// PUT actualizar
+// PUT
 const actualizarUsuario = async () => {
 
 if(!id){
@@ -145,8 +140,7 @@ setLoading(false)
 }
 
 
-
-// DELETE usuario
+// DELETE
 const eliminarUsuario = async (usuarioId) => {
 
 setLoading(true)
@@ -173,16 +167,13 @@ setLoading(false)
 
 return(
 
-<ImageBackground
-source={require("./assets/bosque.jpg")}
-style={styles.background}
-imageStyle={{resizeMode:"cover"}}
->
-
-<View style={styles.overlay}>
+<View style={styles.container}>
 
 <Text style={styles.titulo}>Gestión de Usuarios</Text>
 
+<ScrollView showsVerticalScrollIndicator={false}>
+
+<View style={styles.formCard}>
 
 <TextInput
 style={styles.input}
@@ -207,9 +198,6 @@ value={edad}
 onChangeText={setEdad}
 />
 
-
-<View style={styles.botones}>
-
 <TouchableOpacity style={styles.btn} onPress={obtenerUsuarios}>
 <Text style={styles.btnText}>Obtener Usuarios</Text>
 </TouchableOpacity>
@@ -224,28 +212,27 @@ onChangeText={setEdad}
 
 </View>
 
-
-{loading && <ActivityIndicator size="large" color="#2e7d32" />}
-
+{loading && <ActivityIndicator size="large" color="#1b5e20" style={{marginTop:20}} />}
 
 <FlatList
 data={usuarios}
+scrollEnabled={false}
 keyExtractor={(item)=>item.id.toString()}
 renderItem={({item}) => (
 
-<View style={styles.card}>
+<View style={styles.userCard}>
 
-<Text style={styles.cardText}>ID: {item.id}</Text>
-<Text style={styles.cardText}>Nombre: {item.nombre}</Text>
-<Text style={styles.cardText}>Edad: {item.edad}</Text>
+<View>
+<Text style={styles.userName}>{item.nombre}</Text>
+<Text style={styles.userInfo}>ID: {item.id}</Text>
+<Text style={styles.userInfo}>Edad: {item.edad}</Text>
+</View>
 
 <TouchableOpacity
 style={styles.deleteBtn}
 onPress={()=> eliminarUsuario(item.id)}
 >
-
 <Text style={styles.deleteText}>Eliminar</Text>
-
 </TouchableOpacity>
 
 </View>
@@ -253,9 +240,9 @@ onPress={()=> eliminarUsuario(item.id)}
 )}
 />
 
-</View>
+</ScrollView>
 
-</ImageBackground>
+</View>
 
 )
 
@@ -265,75 +252,91 @@ onPress={()=> eliminarUsuario(item.id)}
 
 const styles = StyleSheet.create({
 
-background:{
+container:{
 flex:1,
-width:"100%",
-height:"100%"
-},
-
-overlay:{
-flex:1,
-backgroundColor:"rgba(255,255,255,0.9)",
+backgroundColor:"#f2f4f7",
 padding:20
 },
 
 titulo:{
-fontSize:30,
+fontSize:28,
 fontWeight:"bold",
 textAlign:"center",
 marginBottom:20,
 color:"#1b5e20"
 },
 
-input:{
-borderWidth:1,
-padding:10,
-marginBottom:10,
-borderRadius:6,
-backgroundColor:"#fff"
+formCard:{
+backgroundColor:"#fff",
+borderRadius:15,
+padding:15,
+marginBottom:20,
+alignSelf:"center",
+width:"70%",
+shadowColor:"#000",
+shadowOpacity:0.15,
+shadowRadius:6,
+elevation:4
 },
 
-botones:{
-marginBottom:10
+input:{
+backgroundColor:"#f4f4f4",
+padding:10,
+borderRadius:8,
+marginBottom:10,
+fontSize:14
 },
 
 btn:{
 backgroundColor:"#2e7d32",
-padding:12,
-marginBottom:10,
-borderRadius:6,
+padding:10,
+borderRadius:8,
+marginTop:6,
 alignItems:"center"
 },
 
 btnText:{
 color:"#fff",
-fontWeight:"bold"
+fontWeight:"bold",
+fontSize:14
 },
 
-card:{
-backgroundColor:"#ffffff",
+userCard:{
+backgroundColor:"#fff",
+borderRadius:12,
 padding:15,
-marginTop:10,
-borderRadius:8,
-borderWidth:1,
-borderColor:"#ddd"
+marginBottom:12,
+flexDirection:"row",
+justifyContent:"space-between",
+alignItems:"center",
+shadowColor:"#000",
+shadowOpacity:0.1,
+shadowRadius:5,
+elevation:3
 },
 
-cardText:{
-fontSize:16
+userName:{
+fontSize:16,
+fontWeight:"bold",
+color:"#1b5e20"
+},
+
+userInfo:{
+fontSize:13,
+color:"#555"
 },
 
 deleteBtn:{
 backgroundColor:"#c62828",
-padding:8,
-marginTop:10,
-borderRadius:5,
-alignItems:"center"
+paddingVertical:6,
+paddingHorizontal:12,
+borderRadius:6
 },
 
 deleteText:{
 color:"#fff",
-fontWeight:"bold"
+fontWeight:"bold",
+fontSize:13
 }
 
 });
