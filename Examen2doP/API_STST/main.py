@@ -34,7 +34,7 @@ async def bienvenida():
 #Modelo de validacion Pydantic
 class ticket_create(BaseModel):
     id: int = Field(...,gt=0, description="Identificador de usuario")
-    nombre_usuario: str = Field(...,gt=5 , example="Abdiel Gonzales Paulin" )
+    nombre_usuario: str = Field(...,min_length=5 , example="Abdiel Gonzales Paulin" )
     Descripción_problema: str = Field(...,min_length=20 , max_length=200, description= "La pagina dejo de Funcionar al camiar el estilo de la misma paginaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     prioridad: Literal["Baja","Media","Alta"]
     estado: Literal["Pendiente", "Resuelto"]
@@ -71,7 +71,7 @@ async def leer_tickets():
     return{
         "status":"200",
         "total": len(tickets),
-        "libros":tickets
+        "Tickets":tickets
     }
 #Crear Tickets
 @app.post("/v1/STicketsST/", tags=['CRUD HTTP'], status_code=status.HTTP_201_CREATED)
@@ -82,7 +82,7 @@ async def registrar_ticket(Ticket:ticket_create):
                 status_code=400,
                 detail="El id ya existe"
             )
-    tickets.append(Ticket)
+    tickets.append(Ticket.model_dump())
     return{
         "mensaje":"Ticket agregado",
         "Ticket":Ticket
@@ -120,7 +120,7 @@ async def cambiar_estado_ticket(id: int):
             tcket["estado"] = "Resuelto"
             
             return {
-                "mensaje": f"El libro '{tcket['id']}' se ha Resuelto Corectamente",
+                "mensaje": f"El Ticket'{tcket['id']}' se ha Resuelto Corectamente",
                 "Ticket": tcket
             }
 
@@ -136,11 +136,16 @@ async def eliminar_prestamo(id: int):
     
     for ticket in tickets:
         if ticket["id"] == id:
+            if ticket["estado"] == "Resuelto":
+                raise HTTPException(
+                    status_code=400,
+                    detail="No se puede eliminar un ticket que ya está Resuelto"
+                )
             tickets.remove(ticket)
       
             
             return {
-                "mensaje": "Préstamo eliminado",
+                "mensaje": "Ticket eliminado",
                 "id_Ticket": id,
                 
             }
