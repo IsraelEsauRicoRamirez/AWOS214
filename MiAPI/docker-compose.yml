@@ -1,10 +1,38 @@
-#------COMO ORQUESTAR LOS CONTENEDORES EN ESTE CASO SOLO 1 ---------
+version: "3.9"
+
 services:
+
   api:
     build: .
-    container_name: server_fastapi
+    container_name: ServerFastAPI
     ports:
       - "5000:5000"
     volumes:
-      - ./app:/app/app
-      
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://admin:123456@postgres:5434/DB_miapi #Cambiamos el puerto al 5434
+# Contenedor del Postgres
+  postgres:
+    image: postgres:15
+    container_name: ServerPostgreSql
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: DB_miapi
+    ports:
+      - "5434:5434"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data #Lugar para guardar informacion de la base de datos
+
+    healthcheck: #Agregar como buna practicaara comprobar la salud del contenedor
+      test: ["CMD-SHELL", "pg_isready -U admin -d DB_miapi"]
+      interval: 5s
+      retries: 5
+      timeout: 5s
+
+volumes: #Todo lo que tenga que ver con la API y el contenedor va a ir aqui
+  postgres_data:
