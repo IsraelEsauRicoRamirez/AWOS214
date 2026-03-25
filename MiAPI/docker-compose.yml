@@ -13,7 +13,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://admin:123456@postgres:5434/DB_miapi #Cambiamos el puerto al 5434
+      DATABASE_URL: postgresql://admin:123456@postgres:5432/DB_miapi #Cambiamos el puerto al 5434
 # Contenedor del Postgres
   postgres:
     image: postgres:15
